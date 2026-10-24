@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>WACC Calculator</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #64748b;
+      --line: #e5eaf2;
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --success: #0f9f6e;
+      --danger: #dc2626;
+      --shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32rem),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      width: min(100%, 760px);
+      margin: 0 auto;
+      padding: 24px 16px 42px;
+    }
+
+    .hero {
+      padding: 10px 4px 20px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 7vw, 3.2rem);
+      line-height: 1.02;
+      letter-spacing: -0.045em;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.55;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(229, 234, 242, 0.92);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .form-wrap {
+      padding: 20px;
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 0.86rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .input-shell {
+      display: flex;
+      align-items: center;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      transition: 0.2s ease;
+      overflow: hidden;
+    }
+
+    .input-shell:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.09);
+      background: #fff;
+    }
+
+    input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 1rem;
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .suffix {
+      padding: 0 14px 0 0;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.2s ease, opacity 0.2s ease;
+    }
+
+    button:active { transform: scale(0.985); }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover { background: var(--accent-2); }
+
+    .secondary {
+      background: #edf2f7;
+      color: var(--text);
+    }
+
+    .error {
+      display: none;
+      margin: 14px 0 0;
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #fef2f2;
+      color: var(--danger);
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .result {
+      border-top: 1px solid var(--line);
+      padding: 22px 20px 20px;
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+    }
+
+    .result-top {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .result-label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .wacc {
+      margin-top: 5px;
+      font-size: clamp(2.7rem, 13vw, 4.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      font-weight: 900;
+      color: var(--success);
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #e8f7f1;
+      color: #087854;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .metric {
+      padding: 13px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 1rem;
+    }
+
+    .formula {
+      margin-top: 16px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-size: 0.79rem;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .formula strong { color: var(--text); }
+
+    .footnote {
+      margin: 16px 4px 0;
+      color: var(--muted);
+      font-size: 0.76rem;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 640px) {
+      .page { padding: 42px 24px 56px; }
+      .form-wrap, .result { padding: 28px; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+      .field.full { grid-column: 1 / -1; }
+      .breakdown { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">Corporate Finance Tool</div>
+      <h1>WACC Calculator</h1>
+      <p>
+        Calculate the Weighted Average Cost of Capital using the capital structure,
+        after-tax cost of debt, and CAPM-derived cost of equity.
+      </p>
+    </header>
+
+    <section class="card">
+      <div class="form-wrap">
+        <div class="section-title">Inputs</div>
+
+        <div class="grid">
+          <div class="field">
+            <label for="equity">Total Equity</label>
+            <div class="input-shell">
+              <input id="equity" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 700" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="debt">Total Debt</label>
+            <div class="input-shell">
+              <input id="debt" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 300" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="costDebt">Cost of debt</label>
+            <div class="input-shell">
+              <input id="costDebt" type="number" inputmode="decimal" step="any" placeholder="e.g. 6" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="taxRate">Tax rate</label>
+            <div class="input-shell">
+              <input id="taxRate" type="number" inputmode="decimal" step="any" placeholder="e.g. 25" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="riskFree">Risk-free rate</label>
+            <div class="input-shell">
+              <input id="riskFree" type="number" inputmode="decimal" step="any" placeholder="e.g. 4" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="erp">Equity risk premium</label>
+            <div class="input-shell">
+              <input id="erp" type="number" inputmode="decimal" step="any" placeholder="e.g. 5.5" />
+              <span class="suffix">%</span>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label for="beta">Beta</label>
+            <div class="input-shell">
+              <input id="beta" type="number" inputmode="decimal" step="any" placeholder="e.g. 1.10" />
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="calculateBtn">Calculate WACC</button>
+          <button class="secondary" id="resetBtn" type="button">Reset</button>
+        </div>
+
+        <div class="error" id="errorBox" role="alert"></div>
+      </div>
+
+      <div class="result" aria-live="polite">
+        <div class="result-top">
+          <div>
+            <div class="result-label">Weighted Average Cost of Capital</div>
+            <div class="wacc" id="waccValue">—</div>
+          </div>
+          <div class="badge" id="statusBadge">Enter inputs</div>
+        </div>
+
+        <div class="breakdown">
+          <div class="metric">
+            <span>Cost of equity</span>
+            <strong id="costEquityValue">—</strong>
+          </div>
+          <div class="metric">
+            <span>After-tax debt cost</span>
+            <strong id="afterTaxDebtValue">—</strong>
+          </div>
+          <div class="metric">
+            <span>Equity weight</span>
+            <strong id="equityWeightValue">—</strong>
+          </div>
+          <div class="metric">
+            <span>Debt weight</span>
+            <strong id="debtWeightValue">—</strong>
+          </div>
+        </div>
+
+        <div class="formula">
+          <strong>Method:</strong>
+          Cost of Equity = Risk-free Rate + Beta × Equity Risk Premium.
+          WACC = (E ÷ V × Cost of Equity) + (D ÷ V × Cost of Debt × (1 − Tax Rate)),
+          where V = E + D.
+        </div>
+      </div>
+    </section>
+
+    <p class="footnote">
+      Equity and debt can be entered in any consistent currency or unit (for example,
+      USD millions). The calculator uses their relative weights, so the unit does not
+      affect the resulting percentage.
+    </p>
+  </main>
+
+  <script>
+    const ids = ["equity", "debt", "costDebt", "taxRate", "riskFree", "erp", "beta"];
+    const $ = (id) => document.getElementById(id);
+
+    function readNumber(id) {
+      const raw = $(id).value.trim();
+      if (raw === "") return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function pct(n) {
+      return `${n.toFixed(2)}%`;
+    }
+
+    function showError(message) {
+      $("errorBox").textContent = message;
+      $("errorBox").style.display = "block";
+    }
+
+    function clearError() {
+      $("errorBox").style.display = "none";
+      $("errorBox").textContent = "";
+    }
+
+    function calculate() {
+      clearError();
+
+      const E = readNumber("equity");
+      const D = readNumber("debt");
+      const rdPct = readNumber("costDebt");
+      const taxPct = readNumber("taxRate");
+      const rfPct = readNumber("riskFree");
+      const erpPct = readNumber("erp");
+      const beta = readNumber("beta");
+
+      const values = [E, D, rdPct, taxPct, rfPct, erpPct, beta];
+      if (values.some(v => v === null)) {
+        showError("Please complete all seven inputs with valid numbers.");
+        return;
+      }
+
+      if (E < 0 || D < 0) {
+        showError("Total equity and total debt cannot be negative.");
+        return;
+      }
+
+      if (E + D <= 0) {
+        showError("Total equity plus total debt must be greater than zero.");
+        return;
+      }
+
+      if (taxPct < 0 || taxPct > 100) {
+        showError("Tax rate must be between 0% and 100%.");
+        return;
+      }
+
+      const rd = rdPct / 100;
+      const tax = taxPct / 100;
+      const rf = rfPct / 100;
+      const erp = erpPct / 100;
+
+      const costEquity = rf + beta * erp;
+      const afterTaxDebt = rd * (1 - tax);
+      const V = E + D;
+      const weightEquity = E / V;
+      const weightDebt = D / V;
+
+      const wacc = (weightEquity * costEquity) + (weightDebt * afterTaxDebt);
+
+      $("waccValue").textContent = pct(wacc * 100);
+      $("costEquityValue").textContent = pct(costEquity * 100);
+      $("afterTaxDebtValue").textContent = pct(afterTaxDebt * 100);
+      $("equityWeightValue").textContent = pct(weightEquity * 100);
+      $("debtWeightValue").textContent = pct(weightDebt * 100);
+      $("statusBadge").textContent = "Calculated";
+    }
+
+    function reset() {
+      ids.forEach(id => $(id).value = "");
+      clearError();
+      $("waccValue").textContent = "—";
+      $("costEquityValue").textContent = "—";
+      $("afterTaxDebtValue").textContent = "—";
+      $("equityWeightValue").textContent = "—";
+      $("debtWeightValue").textContent = "—";
+      $("statusBadge").textContent = "Enter inputs";
+      $("equity").focus();
+    }
+
+    $("calculateBtn").addEventListener("click", calculate);
+    $("resetBtn").addEventListener("click", reset);
+
+    ids.forEach(id => {
+      $(id).addEventListener("keydown", (event) => {
+        if (event.key === "Enter") calculate();
+      });
+    });
+  </script>
+</body>
+</html>
